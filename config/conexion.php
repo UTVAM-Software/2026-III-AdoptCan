@@ -1,7 +1,8 @@
 
 <?php
 
-$host = "localhost";
+$host = "127.0.0.1";
+$puerto = "3307";
 $base_datos = "nutrisalud";
 $usuario = "root";
 $contrasena = "";
@@ -9,7 +10,7 @@ $contrasena = "";
 try {
 
     $conexion = new PDO(
-        "mysql:host=$host;dbname=$base_datos;charset=utf8mb4",
+        "mysql:host=$host;port=$puerto;dbname=$base_datos;charset=utf8mb4",
         $usuario,
         $contrasena
     );

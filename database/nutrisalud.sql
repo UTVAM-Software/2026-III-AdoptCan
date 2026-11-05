@@ -1,18 +1,30 @@
+
+-- =====================================================
+-- PROYECTO: NUTRISALUD
+-- BASE DE DATOS: nutrisalud
+-- =====================================================
+
 CREATE DATABASE IF NOT EXISTS nutrisalud
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
 USE nutrisalud;
 
+-- =====================================================
 -- TABLA DE ROLES
-CREATE TABLE roles (
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE,
     descripcion VARCHAR(150)
 ) ENGINE=InnoDB;
 
---TABLA DE USUARIOS
-CREATE TABLE usuarios (
+-- =====================================================
+-- TABLA DE USUARIOS
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     correo VARCHAR(120) NOT NULL UNIQUE,
@@ -24,15 +36,21 @@ CREATE TABLE usuarios (
     FOREIGN KEY (rol_id) REFERENCES roles(id)
 ) ENGINE=InnoDB;
 
---TABLA DE PERMISOS
-CREATE TABLE permisos (
+-- =====================================================
+-- TABLA DE PERMISOS
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS permisos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(80) NOT NULL UNIQUE,
     descripcion VARCHAR(150)
 ) ENGINE=InnoDB;
 
---RELACION ENTRE ROLES Y PERMISOS
-CREATE TABLE rol_permiso (
+-- =====================================================
+-- RELACION ENTRE ROLES Y PERMISOS
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS rol_permiso (
     id INT AUTO_INCREMENT PRIMARY KEY,
     rol_id INT NOT NULL,
     permiso_id INT NOT NULL,
@@ -43,8 +61,11 @@ CREATE TABLE rol_permiso (
     FOREIGN KEY (permiso_id) REFERENCES permisos(id)
 ) ENGINE=InnoDB;
 
---TABLA DE SERVICIOS
-CREATE TABLE servicios (
+-- =====================================================
+-- TABLA DE SERVICIOS
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS servicios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(120) NOT NULL,
     descripcion TEXT,
@@ -53,8 +74,11 @@ CREATE TABLE servicios (
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
---TABLA DE CITAS
-CREATE TABLE citas (
+-- =====================================================
+-- TABLA DE CITAS
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS citas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NULL,
     servicio_id INT NULL,
@@ -73,8 +97,11 @@ CREATE TABLE citas (
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
---TABLA DE SOLICITUDES DE CONSEJOS
-CREATE TABLE solicitudes_consejo (
+-- =====================================================
+-- TABLA DE SOLICITUDES DE CONSEJOS
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS solicitudes_consejo (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NULL,
     nombre VARCHAR(100) NOT NULL,
@@ -88,13 +115,19 @@ CREATE TABLE solicitudes_consejo (
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+-- =====================================================
 -- INSERTAR ROLES INICIALES
-INSERT INTO roles (nombre, descripcion) VALUES
+-- =====================================================
+
+INSERT IGNORE INTO roles (nombre, descripcion) VALUES
 ('Administrador', 'Acceso completo al sistema'),
 ('Empleado', 'Gestion de citas y solicitudes');
 
+-- =====================================================
 -- INSERTAR PERMISOS
-INSERT INTO permisos (nombre, descripcion) VALUES
+-- =====================================================
+
+INSERT IGNORE INTO permisos (nombre, descripcion) VALUES
 ('gestionar_usuarios', 'Administrar usuarios'),
 ('gestionar_roles', 'Administrar roles'),
 ('gestionar_permisos', 'Administrar permisos'),
@@ -103,12 +136,18 @@ INSERT INTO permisos (nombre, descripcion) VALUES
 ('gestionar_consejos', 'Administrar solicitudes'),
 ('ver_listados', 'Consultar listados');
 
--- EL ADMINISTRADOR RECIBE TODOS LOS PERMISOS
-INSERT INTO rol_permiso (rol_id, permiso_id)
+-- =====================================================
+-- PERMISOS DEL ADMINISTRADOR
+-- =====================================================
+
+INSERT IGNORE INTO rol_permiso (rol_id, permiso_id)
 SELECT 1, id FROM permisos;
 
+-- =====================================================
 -- PERMISOS DEL EMPLEADO
-INSERT INTO rol_permiso (rol_id, permiso_id)
+-- =====================================================
+
+INSERT IGNORE INTO rol_permiso (rol_id, permiso_id)
 SELECT 2, id FROM permisos
 WHERE nombre IN (
     'gestionar_citas',
