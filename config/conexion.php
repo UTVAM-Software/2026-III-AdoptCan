@@ -1,17 +1,15 @@
 
-
 <?php
 
-$configLocal = __DIR__ . '/conexion.local.php';
+$configFile = __DIR__ . '/conexion.local.php';
 
-if (!file_exists($configLocal)) {
-    exit("No se encontró la configuración de la base de datos.");
+if (!file_exists($configFile)) {
+    exit('Falta configurar la conexión. Ejecuta instalar.bat.');
 }
 
-$config = require $configLocal;
+$config = require $configFile;
 
 try {
-
     $host = $config['host'];
     $puerto = $config['puerto'];
     $base_datos = $config['base_datos'];
@@ -35,8 +33,6 @@ try {
     );
 
 } catch (PDOException $e) {
-
     error_log($e->getMessage());
-    exit("No se pudo conectar con la base de datos.");
-
+    exit('No se pudo conectar con la base de datos.');
 }
