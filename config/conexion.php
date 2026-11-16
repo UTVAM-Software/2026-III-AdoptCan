@@ -1,21 +1,20 @@
-
 <?php
 
 $configFile = __DIR__ . '/conexion.local.php';
 
 if (!file_exists($configFile)) {
-    exit('Falta configurar la conexión. Ejecuta instalar.bat.');
+    exit("Falta la configuración de conexión. Ejecuta instalar.bat.");
 }
 
 $config = require $configFile;
 
-try {
-    $host = $config['host'];
-    $puerto = $config['puerto'];
-    $base_datos = $config['base_datos'];
-    $usuario = $config['usuario'];
-    $contrasena = $config['contrasena'];
+$host = $config['host'];
+$puerto = $config['puerto'];
+$base_datos = $config['base_datos'];
+$usuario = $config['usuario'];
+$contrasena = $config['contrasena'];
 
+try {
     $conexion = new PDO(
         "mysql:host=$host;port=$puerto;dbname=$base_datos;charset=utf8mb4",
         $usuario,
@@ -34,5 +33,5 @@ try {
 
 } catch (PDOException $e) {
     error_log($e->getMessage());
-    exit('No se pudo conectar con la base de datos.');
+    exit("No se pudo conectar con la base de datos.");
 }
