@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriSalud - Nutrición con propósito</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Supabase JS Client SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        handwriting: ['Caveat', 'cursive'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f2f9f4',
+                            100: '#e1f2e5',
+                            200: '#c3e5cc',
+                            300: '#95d1a5',
+                            400: '#62b57b',
+                            500: '#3e9959',
+                            600: '#2e7d44',
+                            700: '#276439',
+                            800: '#225030',
+                            900: '#1d4229',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #17306e;
+        }
+        .page-view {
+            display: none;
+        }
+        .page-view.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .nav-tab.active-tab {
+            color: #276439;
+            font-weight: 700;
+            border-bottom: 2px solid #2e7d44;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col justify-between antialiased selection:bg-brand-100 selection:text-brand-800">
+
+    <header class="w-full bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Logo y Marca (Redirige a la página de Inicio) -->
+            <a href="#/inicio" class="flex items-center gap-3 group">
+                <div class="text-brand-600 text-3xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-leaf"></i> 
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-2xl font-bold tracking-tight text-brand-800 leading-none">NutriSalud</span>
+                    <span class="text-xs font-medium text-gray-500 mt-1 tracking-wide">Nutrición con propósito</span>
+                </div>
+            </a>
+
+            <!-- Menú Navegación Multipágina (Desktop) -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium">
+                <a href="#/inicio" data-page="inicio" class="nav-tab text-gray-600 hover:text-brand-600 transition-colors pb-1">Inicio</a>
+                <a href="#/conoceme" data-page="conoceme" class="nav-tab text-gray-600 hover:text-brand-600 transition-colors pb-1">Conóceme</a>
+                <a href="#/servicios" data-page="servicios" class="nav-tab text-gray-600 hover:text-brand-600 transition-colors pb-1">Mis Servicios</a>
+                <a href="#/consejos" data-page="consejos" class="nav-tab text-gray-600 hover:text-brand-600 transition-colors pb-1">Solicitar Consejos</a>
+                <a href="#/contacto" data-page="contacto" class="nav-tab text-gray-600 hover:text-brand-600 transition-colors pb-1">Mi Contacto</a>
+            </nav>
+
+            <!-- Botón Menú Móvil -->
+            <div class="md:hidden">
+                <button type="button" id="mobile-menu-btn" class="p-2 text-gray-600 hover:text-brand-700 focus:outline-none">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Menú Móvil -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-100 px-6 pt-3 pb-6 space-y-3 shadow-lg">
+            <a href="#/inicio" class="mobile-nav-link block py-2 text-gray-700 hover:text-brand-700 font-medium border-b border-gray-50">Inicio</a>
+            <a href="#/conoceme" class="mobile-nav-link block py-2 text-gray-700 hover:text-brand-700 font-medium border-b border-gray-50">Conóceme</a>
+            <a href="#/servicios" class="mobile-nav-link block py-2 text-gray-700 hover:text-brand-700 font-medium border-b border-gray-50">Mis Servicios</a>
+            <a href="#/consejos" class="mobile-nav-link block py-2 text-gray-700 hover:text-brand-700 font-medium border-b border-gray-50">Solicitar Consejos</a>
+            <a href="#/contacto" class="mobile-nav-link block py-2 text-gray-700 hover:text-brand-700 font-medium">Mi Contacto</a>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+
+        <!-- ==========================================
+             PÁGINA 1: INICIO (#/inicio)
+             ========================================== -->
+        <div id="page-inicio" class="page-view">
+            <!-- Hero Banner -->
+            <section class="relative bg-gradient-to-r from-[#eaf2ec] via-[#f2f7f3] to-[#eaf2ec] overflow-hidden py-12 lg:py-20 border-b border-brand-100/50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                        <div class="lg:col-span-6 space-y-6 text-left">
+                            <span class="inline-block text-xs uppercase tracking-widest font-extrabold text-brand-700 bg-brand-100/80 px-3 py-1 rounded-full">
+                                NUTRICIÓN CLÍNICA Y INTEGRAL
+                            </span>
+                            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-brand-900 leading-tight">
+                                Tu salud empieza <br class="hidden sm:inline"/>
+                                con una buena alimentación
+                            </h1>
+                            <p class="text-gray-600 text-base sm:text-lg max-w-xl leading-relaxed">
+                                Aprende a comer mejor sin restricciones severas. Te acompaño a construir hábitos saludables y duraderos.
+                            </p>
+                            <div class="pt-2 flex flex-wrap items-center gap-4">
+                                <a href="#/servicios" class="inline-flex items-center gap-3 bg-brand-700 hover:bg-brand-800 text-white font-semibold px-6 py-3.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200">
+                                    <i class="fa-solid fa-list-check text-lg"></i>
+                                    <span>Ver Mis Servicios</span>
+                                </a>
+                                <a href="#/contacto" class="inline-flex items-center gap-2 text-brand-700 hover:text-brand-800 font-semibold px-5 py-3.5 rounded-full border border-brand-300 hover:bg-brand-50 transition-colors">
+                                    <span>Agendar Cita Directa</span>
+                                    <i class="fa-solid fa-arrow-right text-sm"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-6 relative flex justify-center">
+                            <div class="relative w-full max-w-lg lg:max-w-none">
+                                <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1200&auto=format&fit=crop" 
+                                        alt="Ensalada saludable y nutrición" 
+                                        class="w-full h-[320px] sm:h-[420px] object-cover"
+                                    />
+                                    <div class="absolute right-4 bottom-4 bg-white/95 backdrop-blur-sm p-4 rounded-2xl shadow-xl max-w-[230px] border border-gray-100 transform rotate-2">
+                                        <p class="font-handwriting text-2xl text-gray-800 leading-tight">
+                                            Comer bien también es una forma de cuidarte ♡
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Accesos Rápidos a Otras Páginas -->
+            <section class="py-16 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center max-w-2xl mx-auto mb-12">
+                        <h2 class="text-2xl sm:text-3xl font-bold text-brand-900">¿Qué deseas explorar hoy?</h2>
+                        <p class="text-gray-500 text-sm mt-2">Haz clic en cualquiera de las secciones para ir directamente a esa página.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Card Conóceme -->
+                        <a href="#/conoceme" class="group bg-brand-50/50 hover:bg-brand-100/60 border border-brand-100 p-6 rounded-2xl transition-all duration-300 flex flex-col justify-between">
+                            <div>
+                                <div class="w-12 h-12 rounded-xl bg-brand-700 text-white flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-user-doctor"></i>
+                                </div>
+                                <h3 class="font-bold text-gray-900 text-lg mb-1">Conóceme</h3>
+                                <p class="text-xs text-gray-600 leading-relaxed">Descubre mi formación profesional, trayectoria y filosofía nutricional.</p>
+                            </div>
+                            <span class="mt-4 text-xs font-bold text-brand-700 flex items-center gap-1 group-hover:gap-2 transition-all">
+                                Ir a la página <i class="fa-solid fa-arrow-right"></i>
+                            </span>
+                        </a>
+
+                        <!-- Card Servicios -->
+                        <a href="#/servicios" class="group bg-brand-50/50 hover:bg-brand-100/60 border border-brand-100 p-6 rounded-2xl transition-all duration-300 flex flex-col justify-between">
+                            <div>
+                                <div class="w-12 h-12 rounded-xl bg-brand-700 text-white flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-utensils"></i>
+                                </div>
+                                <h3 class="font-bold text-gray-900 text-lg mb-1">Mis Servicios</h3>
+                                <p class="text-xs text-gray-600 leading-relaxed">Planes personalizados, control de peso, nutrición clínica y deportiva.</p>
+                            </div>
+                            <span class="mt-4 text-xs font-bold text-brand-700 flex items-center gap-1 group-hover:gap-2 transition-all">
+                                Ir a la página <i class="fa-solid fa-arrow-right"></i>
+                            </span>
+                        </a>
+
+                        <!-- Card Consejos -->
+                        <a href="#/consejos" class="group bg-brand-50/50 hover:bg-brand-100/60 border border-brand-100 p-6 rounded-2xl transition-all duration-300 flex flex-col justify-between">
+                            <div>
+                                <div class="w-12 h-12 rounded-xl bg-brand-700 text-white flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-lightbulb"></i>
+                                </div>
+                                <h3 class="font-bold text-gray-900 text-lg mb-1">Solicitar Consejos</h3>
+                                <p class="text-xs text-gray-600 leading-relaxed">Asistente interactivo de recomendaciones rápidas según tu meta de salud.</p>
+                            </div>
+                            <span class="mt-4 text-xs font-bold text-brand-700 flex items-center gap-1 group-hover:gap-2 transition-all">
+                                Ir a la página <i class="fa-solid fa-arrow-right"></i>
+                            </span>
+                        </a>
+
+                        <!-- Card Contacto -->
+                        <a href="#/contacto" class="group bg-brand-50/50 hover:bg-brand-100/60 border border-brand-100 p-6 rounded-2xl transition-all duration-300 flex flex-col justify-between">
+                            <div>
+                                <div class="w-12 h-12 rounded-xl bg-brand-700 text-white flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                </div>
+                                <h3 class="font-bold text-gray-900 text-lg mb-1">Mi Contacto</h3>
+                                <p class="text-xs text-gray-600 leading-relaxed">Agenda tu cita presencial en Tizayuca u online vía WhatsApp / Formulario.</p>
+                            </div>
+                            <span class="mt-4 text-xs font-bold text-brand-700 flex items-center gap-1 group-hover:gap-2 transition-all">
+                                Ir a la página <i class="fa-solid fa-arrow-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==========================================
+             PÁGINA 2: CONÓCEME (#/conoceme)
+             ========================================== -->
+        <div id="page-conoceme" class="page-view">
+            <section class="py-12 sm:py-20 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    
+                    <!-- Encabezado de Página -->
+                    <div class="border-b pb-8 mb-12">
+                        <span class="text-brand-700 font-bold text-xs uppercase tracking-widest bg-brand-100 px-3 py-1 rounded-full">
+                            Página: Conóceme
+                        </span>
+                        <h1 class="text-3xl sm:text-4xl font-bold text-brand-900 mt-3">Sobre Katerine Peniche</h1>
+                        <p class="text-gray-500 text-sm mt-1">Especialista en Nutrición Clínica e Integral con propósito.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                        <div class="lg:col-span-5">
+                            <div class="relative">
+                                <div class="absolute -inset-4 bg-brand-100 rounded-3xl transform -rotate-2"></div>
+                                <img 
+                                    src="https://images.unsplash.com/photo-1594824813566-7885a3977436?q=80&w=800&auto=format&fit=crop" 
+                                    alt="Nutrióloga Katerine Peniche" 
+                                    class="relative rounded-2xl shadow-xl w-full h-[450px] object-cover"
+                                />
+                                <div class="absolute -bottom-6 -right-6 bg-brand-700 text-white p-5 rounded-2xl shadow-lg hidden sm:block">
+                                    <p class="text-3xl font-bold">+2 Años</p>
+                                    <p class="text-xs text-brand-100">de Experiencia</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-7 space-y-6">
+                            <h2 class="text-2xl sm:text-3xl font-bold text-brand-900 leading-tight">
+                                Mi filosofía: Comer bien debe ser un placer, no un castigo
+                            </h2>
+                            
+                            <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
+                                Cuento con la licenciatura en Nutrición y especializaciones enfocadas en el bienestar integral. Mi objetivo principal es guiar a cada persona hacia un estilo de vida pleno sin caer en restricciones que afecten la relación con los alimentos.
+                            </p>
+                            
+                            <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
+                                Trabajo a partir de la educación alimentaria para que aprendas a tomar decisiones sabias en tu día a día, adaptándome a tus horarios, posibilidades y preferencias personales.
+                            </p>
+
+                            <!-- Credenciales -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                                <div class="p-4 rounded-xl bg-brand-50 border border-brand-100 flex items-start gap-3">
+                                    <i class="fa-solid fa-graduation-cap text-brand-700 text-xl mt-1"></i>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900 text-sm">Cédula Profesional</h4>
+                                        <p class="text-xs text-gray-500">Lic. en Nutrición Humana y Dietética</p>
+                                    </div>
+                                </div>
+                                <div class="p-4 rounded-xl bg-brand-50 border border-brand-100 flex items-start gap-3">
+                                    <i class="fa-solid fa-certificate text-brand-700 text-xl mt-1"></i>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900 text-sm">Diplomado Especializado</h4>
+                                        <p class="text-xs text-gray-500">Nutrición Deportiva y Metabolismo</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-6 flex flex-wrap items-center gap-4">
+                                <a href="#/contacto" class="bg-brand-700 hover:bg-brand-800 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all text-sm">
+                                    Agendar Consulta Conmigo
+                                </a>
+                                <a href="#/servicios" class="text-brand-700 hover:text-brand-800 font-semibold text-sm underline">
+                                    Ver planes de atención
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+        <!-- ==========================================
+             PÁGINA 3: MIS SERVICIOS (#/servicios)
+             ========================================== -->
+        <div id="page-servicios" class="page-view">
+            <section class="py-12 sm:py-20 bg-gray-50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    
+                    <!-- Encabezado de Página -->
+                    <div class="border-b border-gray-200 pb-8 mb-12">
+                        <span class="text-brand-700 font-bold text-xs uppercase tracking-widest bg-brand-100 px-3 py-1 rounded-full">
+                            Página: Mis Servicios
+                        </span>
+                        <h1 class="text-3xl sm:text-4xl font-bold text-brand-900 mt-3">Catálogo de Servicios Nutricionales</h1>
+                        <p class="text-gray-500 text-sm mt-1">Consulta las modalidades disponibles y agenda la opción que mejor se adapte a ti.</p>
+                    </div>
+
+                    
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+    
+
+
+
+                        
+                        <!-- Servicio 1 -->
+                        <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200 flex flex-col justify-between hover:shadow-xl transition-all">
+                            <div>
+                                <div class="w-14 h-14 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-2xl mb-6">
+                                    <i class="fa-solid fa-apple-whole"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Planes de Alimentación</h3>
+                                <p class="text-xs font-bold text-brand-600 mb-4">Personalizados 100%</p>
+                                <p class="text-xs text-gray-600 leading-relaxed mb-6">
+                                    Evaluación antropométrica o virtual, cálculo de macronutrientes y entrega de menú semanal adaptado a tus gustos y presupuesto.
+                                </p>
+                            </div>
+                            <div class="pt-4 border-t border-gray-100">
+                                <a href="#/contacto" class="block w-full text-center py-3 bg-brand-700 hover:bg-brand-800 text-white rounded-xl font-bold text-xs transition-colors">
+                                    Solicitar este Servicio
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Servicio 2 -->
+                        <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200 flex flex-col justify-between hover:shadow-xl transition-all">
+                            <div>
+                                <div class="w-14 h-14 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-2xl mb-6">
+                                    <i class="fa-solid fa-dumbbell"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Control de Peso y Composición</h3>
+                                <p class="text-xs font-bold text-brand-600 mb-4">Grasa Corporal / Músculo</p>
+                                <p class="text-xs text-gray-600 leading-relaxed mb-6">
+                                    Programa enfocado en optimizar el porcentaje de grasa y masa magra. Incluye seguimiento quincenal o mensual.
+                                </p>
+                            </div>
+                            <div class="pt-4 border-t border-gray-100">
+                                <a href="#/contacto" class="block w-full text-center py-3 bg-brand-700 hover:bg-brand-800 text-white rounded-xl font-bold text-xs transition-colors">
+                                    Solicitar este Servicio
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Servicio 3 -->
+                        <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200 flex flex-col justify-between hover:shadow-xl transition-all">
+                            <div>
+                                <div class="w-14 h-14 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-2xl mb-6">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Orientación Nutricional</h3>
+                                <p class="text-xs font-bold text-brand-600 mb-4">Educación & Etiquetado</p>
+                                <p class="text-xs text-gray-600 leading-relaxed mb-6">
+                                    Sesiones educativas prácticas para aprender a leer sellos nutrimentales, armar despensas saludables y comer fuera de casa.
+                                </p>
+                            </div>
+                            <div class="pt-4 border-t border-gray-100">
+                                <a href="#/contacto" class="block w-full text-center py-3 bg-brand-700 hover:bg-brand-800 text-white rounded-xl font-bold text-xs transition-colors">
+                                    Solicitar este Servicio
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Servicio 4 -->
+                        <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200 flex flex-col justify-between hover:shadow-xl transition-all">
+                            <div>
+                                <div class="w-14 h-14 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-2xl mb-6">
+                                    <i class="fa-regular fa-heart"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Hábitos Saludables</h3>
+                                <p class="text-xs font-bold text-brand-600 mb-4">Acompañamiento Integral</p>
+                                <p class="text-xs text-gray-600 leading-relaxed mb-6">
+                                    Estrategias para mejorar la relación con la comida, manejo de ansiedad por comer y estructuración de rutinas sostenibles.
+                                </p>
+                            </div>
+                            <div class="pt-4 border-t border-gray-100">
+                                <a href="#/contacto" class="block w-full text-center py-3 bg-brand-700 hover:bg-brand-800 text-white rounded-xl font-bold text-xs transition-colors">
+                                    Solicitar este Servicio
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Servicio 5 -->
+                        <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200 flex flex-col justify-between hover:shadow-xl transition-all">
+                            <div>
+                                <div class="w-14 h-14 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-2xl mb-6">
+                                    <i class="fa-solid fa-notes-medical"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Nutrición Clínica Especializada</h3>
+                                <p class="text-xs font-bold text-brand-600 mb-4">SOP / Diabetes / Hipertensión</p>
+                                <p class="text-xs text-gray-600 leading-relaxed mb-6">
+                                    Manejo médico-nutricional para el control de padecimientos metabólicos, resistencia a la insulina y colitis/gastritis.
+                                </p>
+                            </div>
+                            <div class="pt-4 border-t border-gray-100">
+                                <a href="#/contacto" class="block w-full text-center py-3 bg-brand-700 hover:bg-brand-800 text-white rounded-xl font-bold text-xs transition-colors">
+                                    Solicitar este Servicio
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+        <!-- ==========================================
+             PÁGINA 4: SOLICITAR CONSEJOS (#/consejos)
+             ========================================== -->
+        <div id="page-consejos" class="page-view">
+            <section class="py-12 sm:py-20 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    
+                    <!-- Encabezado de Página -->
+                    <div class="border-b border-gray-100 pb-8 mb-12">
+                        <span class="text-brand-700 font-bold text-xs uppercase tracking-widest bg-brand-100 px-3 py-1 rounded-full">
+                            Página: Solicitar Consejos
+                        </span>
+                        <h1 class="text-3xl sm:text-4xl font-bold text-brand-900 mt-3">Asistente de Consejos Nutricionales</h1>
+                        <p class="text-gray-500 text-sm mt-1">Obtén una recomendación preliminar inmediata y solicita orientación detallada.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                        
+                        <!-- Columna Informativa -->
+                        <div class="lg:col-span-5 space-y-6">
+                            <h2 class="text-2xl font-bold text-brand-900">¿Cómo funciona esta herramienta?</h2>
+                            <p class="text-gray-600 text-sm leading-relaxed">
+                                Selecciona el objetivo principal que deseas trabajar. La plataforma generará automáticamente una recomendación base elaborada por la nutrióloga.
+                            </p>
+                            <p class="text-gray-600 text-sm leading-relaxed">
+                                Si deseas recibir una respuesta formal personalizada en tu correo o WhatsApp, envía tu pregunta a través del formulario adyacente.
+                            </p>
+
+                            <div class="bg-brand-50 p-6 rounded-2xl border border-brand-100 space-y-3">
+                                <div class="flex items-center gap-2 font-bold text-brand-800 text-sm">
+                                    <i class="fa-solid fa-circle-info text-brand-600"></i>
+                                    <span>Nota Importante</span>
+                                </div>
+                                <p class="text-xs text-gray-600 leading-relaxed">
+                                    Los consejos generados son de carácter informativo. Para un plan detallado se recomienda una consulta médica presencial u online.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Formulario Interactivo -->
+                        <div class="lg:col-span-7 bg-gray-50 p-8 rounded-3xl border border-gray-200 shadow-sm">
+                            <form id="consejos-form" onsubmit="handleConsejoSubmit(event)" class="space-y-6">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">1. Selecciona tu meta principal:</label>
+                                    <select id="meta-select" onchange="actualizarTip()" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white font-medium text-gray-800">
+                                        <option value="energia">Aumentar niveles de energía diaria</option>
+                                        <option value="peso">Pérdida de peso progresiva y saludable</option>
+                                        <option value="digestión">Mejorar la salud digestiva / inflamación</option>
+                                        <option value="musculo">Ganancia de masa muscular / Rendimiento</option>
+                                    </select>
+                                </div>
+
+                                <!-- Cuadro de consejo automático -->
+                                <div class="p-5 rounded-2xl bg-white border border-brand-200 shadow-sm space-y-2">
+                                    <span class="text-[11px] font-bold uppercase tracking-wider text-brand-700 block">💡 Consejo Recomendado Inmediato:</span>
+                                    <p id="tip-text" class="text-sm text-gray-700 leading-relaxed font-medium">
+                                        Cargando recomendación...
+                                    </p>
+                                </div>
+
+                                <hr class="border-gray-200 my-4" />
+
+                                <span class="block text-xs font-bold uppercase tracking-wider text-gray-700">2. ¿Quieres un consejo personalizado? Escríbeme:</span>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Nombre Completo</label>
+                                    <input type="text" id="consejo-nombre" required placeholder="Tu nombre" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white" />
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Correo Electrónico</label>
+                                    <input type="email" id="consejo-email" required placeholder="tu@email.com" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white" />
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Escribe tu duda o situación específica</label>
+                                    <textarea id="consejo-mensaje" rows="3" required placeholder="Ej. Me cuesta trabajo cenar ligero por el trabajo..." class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white"></textarea>
+                                </div>
+
+                                <button type="submit" id="consejo-btn" class="w-full py-3.5 bg-brand-700 hover:bg-brand-800 text-white font-bold rounded-xl shadow-md transition-all text-sm flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                    <span>Enviar Solicitud de Consejo</span>
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+        <!-- ==========================================
+             PÁGINA 5: MI CONTACTO (#/contacto)
+             ========================================== -->
+        <div id="page-contacto" class="page-view">
+            <section class="py-12 sm:py-20 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    
+                    <!-- Encabezado de Página -->
+                    <div class="border-b border-gray-100 pb-8 mb-12">
+                        <span class="text-brand-700 font-bold text-xs uppercase tracking-widest bg-brand-100 px-3 py-1 rounded-full">
+                            Página: Mi Contacto
+                        </span>
+                        <h1 class="text-3xl sm:text-4xl font-bold text-brand-900 mt-3">Agendar Cita o Contactarme</h1>
+                        <p class="text-gray-500 text-sm mt-1">Completa el formulario para guardar tu cita en el sistema o envíame un mensaje directo por WhatsApp.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                        
+                        <!-- Columna Datos e Información -->
+                        <div class="lg:col-span-5 space-y-8">
+                            <div>
+                                <h2 class="text-2xl font-bold text-brand-900 mb-4">Información de Atención</h2>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-6">
+                                    Atención presencial en consultorio equipado o modalidad 100% online por videollamada.
+                                </p>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-4 p-4 rounded-2xl bg-brand-50/60 border border-brand-100">
+                                    <div class="w-10 h-10 rounded-xl bg-brand-700 text-white flex items-center justify-center text-lg shrink-0">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900 text-sm">Ubicación del Consultorio</h4>
+                                        <p class="text-xs text-gray-600 mt-0.5">Av. Los Pinos 123, Tizayuca, Hidalgo.</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-4 p-4 rounded-2xl bg-brand-50/60 border border-brand-100">
+                                    <div class="w-10 h-10 rounded-xl bg-brand-700 text-white flex items-center justify-center text-lg shrink-0">
+                                        <i class="fa-solid fa-phone"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900 text-sm">Teléfono / WhatsApp</h4>
+                                        <a href="https://wa.me/525512345678" target="_blank" class="text-xs text-brand-700 font-semibold hover:underline mt-0.5 block">
+                                            +52 55 1234 5678
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-4 p-4 rounded-2xl bg-brand-50/60 border border-brand-100">
+                                    <div class="w-10 h-10 rounded-xl bg-brand-700 text-white flex items-center justify-center text-lg shrink-0">
+                                        <i class="fa-regular fa-envelope"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900 text-sm">Correo Electrónico</h4>
+                                        <a href="mailto:nutrisalud@gmail.com" class="text-xs text-brand-700 font-semibold hover:underline mt-0.5 block">
+                                            nutrisalud@gmail.com
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botón Directo WhatsApp -->
+                            <div class="pt-2">
+                                <a href="https://wa.me/525512345678?text=Hola%20NutriSalud,%20quiero%20agendar%20una%20cita" target="_blank" class="w-full py-3.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-2xl shadow-md transition-all text-sm flex items-center justify-center gap-3">
+                                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                                    <span>Agendar Directo por WhatsApp</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Formulario de Agendamiento Citas (Supabase) -->
+                        <div class="lg:col-span-7 bg-gray-50 p-8 rounded-3xl border border-gray-200 shadow-sm">
+                            <h3 class="text-xl font-bold text-brand-900 mb-6">Formulario de Reserva de Cita</h3>
+                            
+                            <form id="cita-form" onsubmit="handleCitaSubmit(event)" class="space-y-5">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">Nombre Completo *</label>
+                                    <input type="text" id="cita-nombre" required placeholder="Ej. Ana García" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white" />
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-700 mb-1">Correo Electrónico *</label>
+                                        <input type="email" id="cita-email" required placeholder="tu@email.com" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-700 mb-1">Teléfono / WhatsApp *</label>
+                                        <input type="tel" id="cita-telefono" required placeholder="55 1234 5678" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white" />
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-700 mb-1">Servicio de Interés</label>
+                                        <select id="cita-servicio" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white font-medium">
+                                            <option value="Planes de Alimentación">Planes de Alimentación</option>
+                                            <option value="Control de Peso">Control de Peso</option>
+                                            <option value="Orientación Nutricional">Orientación Nutricional</option>
+                                            <option value="Hábitos Saludables">Hábitos Saludables</option>
+                                            <option value="Nutrición Clínica">Nutrición Clínica</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-700 mb-1">Fecha / Horario Preferido</label>
+                                        <input type="text" id="cita-fecha" placeholder="Ej. Lunes por la tarde" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white" />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">Mensaje adicional o motivo de consulta</label>
+                                    <textarea id="cita-mensaje" rows="3" placeholder="Comentarios breves..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none text-sm bg-white"></textarea>
+                                </div>
+
+                                <button type="submit" id="cita-btn" class="w-full py-4 bg-brand-700 hover:bg-brand-800 text-white font-bold rounded-xl shadow-md transition-all text-sm flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                    <span>Confirmar y Guardar Cita</span>
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#eaf2ec] border-t border-brand-100/60 py-10 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-8 text-sm text-gray-700">
+                <div class="flex flex-col sm:flex-row flex-wrap items-center justify-center md:justify-start gap-4 sm:gap-8">
+                    <div class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-location-dot text-brand-700 text-base"></i>
+                        <span>Av. Los Pinos 123, Tizayuca, Hgo.</span>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-phone text-brand-700 text-base"></i>
+                        <a href="tel:5512345678" class="hover:text-brand-700 transition-colors">55 1234 5678</a>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <i class="fa-regular fa-envelope text-brand-700 text-base"></i>
+                        <a href="mailto:nutrisalud@gmail.com" class="hover:text-brand-700 transition-colors">nutrisalud@gmail.com</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <span class="font-medium text-gray-700">Sígueme en redes</span>
+                    <div class="flex items-center gap-2">
+<a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer"
+   class="w-9 h-9 rounded-full bg-brand-800 text-white flex items-center justify-center hover:bg-brand-700 transition-colors text-base shadow-sm">
+    <i class="fa-brands fa-facebook-f"></i>
+</a>
+<a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer"
+   class="w-9 h-9 rounded-full bg-brand-800 text-white flex items-center justify-center hover:bg-brand-700 transition-colors text-base shadow-sm">
+    <i class="fa-brands fa-instagram"></i>
+</a>
+                        </a>
+                        <a href="https://wa.me/525512345678" target="_blank" class="w-9 h-9 rounded-full bg-brand-800 text-white flex items-center justify-center hover:bg-brand-700 transition-colors text-base shadow-sm">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center text-xs text-gray-500 mt-8 pt-4 border-t border-brand-200/50">
+                &copy; NutriSalud - Todos los derechos reservados.
+            </div>
+        </div>
+    </footer>
+
+    <!-- LÓGICA JAVASCRIPT & CONFIGURACIÓN DE SUPABASE -->
+    <script>
+        // ====================================================================
+        // CONFIGURACIÓN DE SUPABASE
+        // Reemplaza los siguientes valores con tus llaves reales de Supabase:
+        // ====================================================================
+        const SUPABASE_URL = 'https://tu-proyecto.supabase.co';
+        const SUPABASE_ANON_KEY = 'tu-anon-public-key';
+
+        let supabaseClient = null;
+
+        // Intentar inicializar Supabase si las claves están definidas
+        if (SUPABASE_URL !== 'https://tu-proyecto.supabase.co' && window.supabase) {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
+        // ====================================================================
+        // NAVEGACIÓN MULTIPÁGINA
+        // ====================================================================
+        const pages = ['inicio', 'conoceme', 'servicios', 'consejos', 'contacto'];
+
+        function navigate() {
+            let hash = window.location.hash.replace('#/', '') || 'inicio';
+            if (!pages.includes(hash)) {
+                hash = 'inicio';
+            }
+
+            // Ocultar todas las páginas
+            document.querySelectorAll('.page-view').forEach(view => {
+                view.classList.remove('active');
+            });
+
+            // Mostrar página actual
+            const activePage = document.getElementById(`page-${hash}`);
+            if (activePage) {
+                activePage.classList.add('active');
+            }
+
+            // Actualizar pestañas activas
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                if (tab.getAttribute('data-page') === hash) {
+                    tab.classList.add('active-tab');
+                } else {
+                    tab.classList.remove('active-tab');
+                }
+            });
+
+            // Cerrar menú móvil al navegar
+            document.getElementById('mobile-menu').classList.add('hidden');
+
+            // Scroll suave hacia arriba
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('hashchange', navigate);
+        window.addEventListener('DOMContentLoaded', () => {
+            navigate();
+            actualizarTip(); // Cargar primer tip en la sección consejos
+        });
+
+        // Menú Móvil Toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // ====================================================================
+        // CONSEJOS DINÁMICOS
+        // ====================================================================
+        const tipsMap = {
+            'energia': 'Prioriza desayunos con proteína limpia y carbohidratos de absorción lenta (ej. avena con semillas y huevo). Mantén hidratación constante (2 a 2.5 L de agua).',
+            'peso': 'Asegura un déficit calórico moderado estructurado. Incluye verduras en comida y cena para aumentar saciedad por volumen de fibra.',
+            'digestión': 'Incrementa el consumo de fibra soluble progresivamente e integra alimentos fermentados. Evita bebidas carbonatadas e ingiere tus alimentos sin prisas.',
+            'musculo': 'Mantén un consumo proteico de 1.6g a 2.0g por kg de peso corporal repartido en 4 tiempos de comida, acompañado de entrenamiento de fuerza.'
+        };
+
+        function actualizarTip() {
+            const select = document.getElementById('meta-select');
+            const tipText = document.getElementById('tip-text');
+            if (select && tipText) {
+                tipText.textContent = tipsMap[select.value] || 'Selecciona un objetivo para visualizar el consejo.';
+            }
+        }
+
+        // ====================================================================
+        // ENVÍO DE FORMULARIO: SOLICITAR CONSEJO
+        // ====================================================================
+        async function handleConsejoSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('consejo-btn');
+            btn.disabled = true;
+            btn.innerText = 'Enviando...';
+
+            const payload = {
+                nombre: document.getElementById('consejo-nombre').value,
+                email: document.getElementById('consejo-email').value,
+                objetivo: document.getElementById('meta-select').value,
+                mensaje: document.getElementById('consejo-mensaje').value
+            };
+
+            if (supabaseClient) {
+                try {
+                    const { error } = await supabaseClient.from('solicitudes_consejo').insert([payload]);
+                    if (error) throw error;
+                    alert('¡Tu solicitud de consejo ha sido guardada con éxito en la base de datos!');
+                    document.getElementById('consejos-form').reset();
+                    actualizarTip();
+                } catch (err) {
+                    console.error('Error Supabase:', err);
+                    alert('Hubo un inconveniente al guardar en la base de datos. Se simulará la recepción.');
+                }
+            } else {
+                // Modo respaldo
+                alert('¡Gracias! Tu solicitud de consejo fue recibida. (Nota: Configura Supabase para almacenamiento persistente).');
+                document.getElementById('consejos-form').reset();
+                actualizarTip();
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i><span>Enviar Solicitud de Consejo</span>';
+        }
+
+        // ====================================================================
+        // ENVÍO DE FORMULARIO: AGENDAR CITA
+        // ====================================================================
+        async function handleCitaSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('cita-btn');
+            btn.disabled = true;
+            btn.innerText = 'Procesando Cita...';
+
+            const payload = {
+                nombre: document.getElementById('cita-nombre').value,
+                email: document.getElementById('cita-email').value,
+                telefono: document.getElementById('cita-telefono').value,
+                servicio: document.getElementById('cita-servicio').value,
+                fecha: document.getElementById('cita-fecha').value,
+                mensaje: document.getElementById('cita-mensaje').value
+            };
+
+            if (supabaseClient) {
+                try {
+                    const { error } = await supabaseClient.from('citas').insert([payload]);
+                    if (error) throw error;
+                    alert(`¡Cita registrada correctamente para ${payload.nombre}! Nos pondremos en contacto contigo.`);
+                    document.getElementById('cita-form').reset();
+                } catch (err) {
+                    console.error('Error Supabase:', err);
+                    alert('Ocurrió un error al registrar la cita en Supabase.');
+                }
+            } else {
+                // Modo respaldo
+                alert(`¡Cita enviada con éxito para ${payload.nombre}! Te redirigiremos a WhatsApp para confirmar la hora.`);
+                const text = encodeURIComponent(`Hola NutriSalud, acabo de llenar el formulario para agendar una cita.\nNombre: ${payload.nombre}\nServicio: ${payload.servicio}`);
+                window.open(`https://wa.me/525512345678?text=${text}`, '_blank');
+                document.getElementById('cita-form').reset();
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-calendar-check"></i><span>Confirmar y Guardar Cita</span>';
+        }
+    </script>
+</body>
+</html>
