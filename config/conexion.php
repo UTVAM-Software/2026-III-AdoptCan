@@ -1,13 +1,22 @@
 
+
 <?php
 
-$host = "127.0.0.1";
-$puerto = "3306";
-$base_datos = "nutrisalud";
-$usuario = "root";
-$contrasena = "";
+$configLocal = __DIR__ . '/conexion.local.php';
+
+if (!file_exists($configLocal)) {
+    exit("No se encontró la configuración de la base de datos.");
+}
+
+$config = require $configLocal;
 
 try {
+
+    $host = $config['host'];
+    $puerto = $config['puerto'];
+    $base_datos = $config['base_datos'];
+    $usuario = $config['usuario'];
+    $contrasena = $config['contrasena'];
 
     $conexion = new PDO(
         "mysql:host=$host;port=$puerto;dbname=$base_datos;charset=utf8mb4",
